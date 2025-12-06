@@ -1,23 +1,27 @@
-// db.js
-import mysql from "mysql2";
+// backend/db.js
+import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config(); 
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+// --- ZONA DE DEPURACIÓN (Veremos esto en la terminal) ---
+console.log("---- INTENTANDO CONECTAR A MYSQL ----");
+console.log("Host:", process.env.DB_HOST);
+console.log("Usuario:", process.env.DB_USER);
+console.log("Base de Datos:", process.env.DB_NAME);
+console.log("Password (longitud):", process.env.DB_PASSWORD ? process.env.DB_PASSWORD.length : "Sin password");
+console.log("---------------------------------------");
+// --------------------------------------------------------
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "invenapp_db", // Aquí usará tu base correcta
+  port: process.env.DB_PORT || 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error("❌ Error al conectar a MySQL:", err);
-  } else {
-    console.log("✅ Conectado a MySQL correctamente");
-  }
-});
-
-// 👇 Exportación correcta como default
-export default connection;
+export default pool
